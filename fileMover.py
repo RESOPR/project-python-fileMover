@@ -25,10 +25,27 @@ def main():
     print("처리할 폴더의 주소를 입력:")
     origin_dir = input()
 
-    file_list = deque()
+    print("목적지 폴더의 주소를 입력:")
+    target_dir = input()
 
+    print("첫번째 문자를 입력:")
+    first_str = input()
+
+    print("마지막 문자를 입력:")
+    end_str = input()
+
+    # deque 선언
+    origin_file_list = deque()
+    target_dir_list = deque()
+
+    # deque에 파일 리스트 담기
     for file in os.listdir(origin_dir):
-        file_list.append(file)
+        origin_file_list.append(file)   
+    for file in os.listdir(target_dir):
+        target_dir_list.append(file)
     
+    cut_file(first_str, end_str, origin_file_list)
+
+
 if __name__ == "__main__":
     main()
