@@ -3,13 +3,11 @@ import shutil
 from collections import deque
 
 # 파일 문자 및 인덱스 번호 자르기
-def cut_file(first_str, end_str, file_list):
-    for file in file_list:
-        file_findex = file.find(first_str)
-        file_findex +=1
-        file_eindex = file.find(end_str)
-        target_name = file[file_findex:file_eindex]
-        print(target_name)
+def cut_file_string(first_str, end_str, progress_file):
+    file_findex = progress_file.find(first_str)
+    file_findex +=1
+    file_eindex = progress_file.find(end_str)
+    target_name = progress_file[file_findex:file_eindex]
     return target_name
 
 # 파일 이동
@@ -34,17 +32,20 @@ def main():
     print("마지막 문자를 입력:")
     end_str = input()
 
-    # deque 선언
+    # 파일 리스트 구성
     origin_file_list = deque()
-    target_dir_list = deque()
+    target_dir_list = os.listdir(target_dir)
 
-    # deque에 파일 리스트 담기
+    # deque 요소 처리
     for file in os.listdir(origin_dir):
-        origin_file_list.append(file)   
-    for file in os.listdir(target_dir):
-        target_dir_list.append(file)
-    
-    cut_file(first_str, end_str, origin_file_list)
+        origin_file_list.append(file)
+
+    while origin_file_list:
+        file = origin_file_list.popleft()
+        print(file)
+        target_name = cut_file_string(first_str, end_str, file)
+        print(target_name)
+
 
 
 if __name__ == "__main__":
