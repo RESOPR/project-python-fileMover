@@ -1,23 +1,18 @@
 import os
 import shutil
-from collections import deque
 
 # 파일 문자 및 인덱스 번호 자르기
-def cut_file_string(first_str, end_str, progress_file):
+def slice_file_string(first_str, end_str, progress_file):
     file_findex = progress_file.find(first_str)
     file_findex +=1
     file_eindex = progress_file.find(end_str)
-    target_name = progress_file[file_findex:file_eindex]
+    target_name = progress_file[file_findex:file_eindex].upper()
     return target_name
-
-# 파일 이동
-def move_file(src, dst, origin_dir, target_dir, file, folder):
-    shutil.move(src, dst)
-    print(origin_dir + '\\' + file + "의 파일을 " + target_dir + folder + '\\' + "로 이동하였습니다.")
-
 
 # 메인 함수 전개
 def main():
+
+    # GUI 부분 시작점 (추후)
     print("프로그램을 실행합니다.")
 
     print("처리할 폴더의 주소를 입력:")
@@ -32,21 +27,34 @@ def main():
     print("마지막 문자를 입력:")
     end_str = input()
 
+    # 파일 리스트 불러오기
+    try:
+        file_list = os.listdir(origin_dir)
+        dst_folder_list = os.listdir(target_dir)
+    except FileNotFoundError as error:
+        print(f"폴더를 찾지 못했어요. : {error}")
+        exit()
+
     # 파일 리스트 구성
-    origin_file_list = deque()
-    target_dir_list = os.listdir(target_dir)
+    dst_file_list = {folder.upper(): folder for folder in dst_folder_list}
 
-    # deque 요소 처리
-    for file in os.listdir(origin_dir):
-        origin_file_list.append(file)
+    for file in file_list:
+        target_name = slice_file_string(first_str, end_str, file)
+        
+        if target_name in dst_file_list:
+            dst_name = dst_file_list[target_name]
+            print(dst_name + "폴더 발견")
+            src = os.path.join(origin_dir, file)
+            dst = os.path.join(target_dir, dst_name)
+            print("소스 파일 " + src + " 도착 폴더 " + dst)
 
-    while origin_file_list:
-        file = origin_file_list.popleft()
-        print(file)
-        target_name = cut_file_string(first_str, end_str, file)
-        print(target_name)
+            try:
+                shutil.move(src, dst)
+                print(f'{src}에서 {dst}로 이동하였습니다.')
+            except FileExistsError as error:
+                print(f"파일이 중복되었어요. : {error}")
+                continue
 
-
-
+# 메인 함수 선언부
 if __name__ == "__main__":
     main()
