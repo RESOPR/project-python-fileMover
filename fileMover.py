@@ -1,46 +1,60 @@
 import os
 import shutil
 
-print("처리할 폴더의 주소를 입력:")
-origin_dir = input()
-
-print("목적지 폴더의 주소를 입력:")
-target_dir = input()
-
-print("첫번째 문자를 입력:")
-first_str = input()
-
-print("마지막 문자를 입력:")
-end_str = input()
-
-# 폴더내 파일 리스트 가져오기
-file_list = os.listdir(origin_dir)
-file_list_target = os.listdir(target_dir)
-
-for file in file_list:
-    # 파일 문자 및 인덱스 번호 자르기
-    file_findex = file.find(first_str)
+# 파일 문자 및 인덱스 번호 자르기
+def slice_file_string(first_str, end_str, progress_file):
+    file_findex = progress_file.find(first_str)
     file_findex +=1
-    file_eindex = file.find(end_str)
-    target_name = file[file_findex:file_eindex]
+    file_eindex = progress_file.find(end_str)
+    target_name = progress_file[file_findex:file_eindex].upper()
+    return target_name
 
-    # 파일 이동
-    for folder in file_list_target:
-        if folder.upper() == target_name.upper():
-            print(folder + " 폴더 발견")
+# 메인 함수 전개
+def main():
+
+    # GUI 부분 시작점 (추후)
+    print("프로그램을 실행합니다.")
+
+    print("처리할 폴더의 주소를 입력:")
+    origin_dir = input()
+
+    print("목적지 폴더의 주소를 입력:")
+    target_dir = input()
+
+    print("첫번째 문자를 입력:")
+    first_str = input()
+
+    print("마지막 문자를 입력:")
+    end_str = input()
+
+    # 파일 리스트 불러오기
+    try:
+        file_list = os.listdir(origin_dir)
+        dst_folder_list = os.listdir(target_dir)
+    except FileNotFoundError as error:
+        print(f"폴더를 찾지 못했어요. : {error}")
+        exit()
+
+    # 파일 리스트 구성
+    dst_file_list = {folder.upper(): folder for folder in dst_folder_list}
+
+    for file in file_list:
+        target_name = slice_file_string(first_str, end_str, file)
+        
+        if target_name in dst_file_list:
+            dst_name = dst_file_list[target_name]
+            print(dst_name + "폴더 발견")
             src = os.path.join(origin_dir, file)
-            dst = os.path.join(target_dir, folder)
-            print("소스 파일 " + src + "도착 폴더 " + dst)
+            dst = os.path.join(target_dir, dst_name)
+            print("소스 파일 " + src + " 도착 폴더 " + dst)
 
-            # 중복 파일 발견 처리
-            dst_files = os.listdir(dst)
-            for df in dst_files:
-                if df.upper() == file.upper():
-                    print("중복파일 존재확인 및 삭제")
-                    del_file = os.path.join(dst, df)
-                    print("삭제될 파일은" + del_file + "입니다.")
-                    os.remove(del_file)
-            # 파일 이동 재게
-            shutil.move(src, dst)
-            print(origin_dir + '\\' + file + "의 파일을 " + target_dir + folder + '\\' + "로 이동하였습니다.")
-            break
+            try:
+                shutil.move(src, dst)
+                print(f'{src}에서 {dst}로 이동하였습니다.')
+            except shutil.Error as error:
+                print(f"파일이 중복되었어요. : {error}")
+                continue
+
+# 메인 함수 선언부
+if __name__ == "__main__":
+    main()
