@@ -51,7 +51,7 @@ def main():
             try:
                 shutil.move(src, dst)
                 print(f'{src}에서 {dst}로 이동하였습니다.')
-            except FileExistsError as error:
+            except shutil.Error as error:
                 print(f"파일이 중복되었어요. : {error}")
                 continue
 
